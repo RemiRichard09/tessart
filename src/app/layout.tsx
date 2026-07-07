@@ -3,9 +3,9 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tessart - Accumulateurs Thermiques",
+  title: "TESSA Plant Studio",
   description:
-    "Découvrez combien vous pouvez économiser avec les accumulateurs thermiques Tessart. Téléversez votre facture Hydro-Québec et obtenez une estimation personnalisée.",
+    "Visualize, simulate, and size thermal storage for industrial plants.",
 };
 
 export default function RootLayout({
@@ -14,31 +14,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="fr"
-      className="h-full antialiased"
-    >
-      <body className="min-h-full flex flex-col bg-white">
-        <header className="border-b border-gray-200 bg-white">
-          <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white font-bold text-lg">
+    <html lang="en" className="h-full antialiased">
+      <body className="flex min-h-full flex-col bg-navy-950 text-txt">
+        <header className="sticky top-0 z-50 border-b border-edge/70 bg-navy-950/85 backdrop-blur">
+          <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-white">
                 T
-              </div>
-              <span className="text-xl font-bold text-gray-900">Tessart</span>
+              </span>
+              <span className="text-[15px] font-semibold tracking-wide">
+                TESSA <span className="text-txt-2">Plant Studio</span>
+              </span>
             </Link>
             <Link
-              href="/economie"
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
+              href="/studio"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-bright"
             >
-              Calculer mes économies
+              Start plant assessment
             </Link>
           </nav>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-gray-200 bg-gray-50">
-          <div className="mx-auto max-w-6xl px-6 py-8 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Tessart. Tous droits réservés.
+        <footer className="border-t border-edge/70">
+          <div className="mx-auto max-w-7xl px-6 py-6 text-center text-xs text-txt-3">
+            &copy; {new Date().getFullYear()} Tessart — TESSA Plant Studio.
+            Simulation results are indicative estimates.
           </div>
         </footer>
       </body>
