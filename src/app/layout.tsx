@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TessartLogo from "@/components/TessartLogo";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TESSA Plant Studio",
+  title: "Tessart Plant Studio",
   description:
     "Visualize, simulate, and size thermal storage for industrial plants.",
 };
@@ -18,12 +19,10 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-navy-950 text-txt">
         <header className="sticky top-0 z-50 border-b border-edge/70 bg-navy-950/85 backdrop-blur">
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-white">
-                T
-              </span>
-              <span className="text-[15px] font-semibold tracking-wide">
-                TESSA <span className="text-txt-2">Plant Studio</span>
+            <Link href="/" className="flex items-baseline gap-2">
+              <TessartLogo className="text-[21px]" />
+              <span className="text-[15px] font-medium tracking-wide text-txt-2">
+                Plant Studio
               </span>
             </Link>
             <Link

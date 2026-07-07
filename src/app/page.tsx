@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TessartLogo from "@/components/TessartLogo";
 
 const STEPS = [
   {
@@ -36,8 +37,11 @@ export default function Home() {
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           Industrial thermal storage
         </p>
-        <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-          TESSA Plant Studio
+        <h1 className="flex flex-col items-center gap-3">
+          <TessartLogo className="text-6xl sm:text-8xl" />
+          <span className="text-3xl font-semibold tracking-[0.18em] text-txt-2 uppercase sm:text-4xl">
+            Plant Studio
+          </span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-txt-2 sm:text-xl">
           Visualize, simulate, and size thermal storage for industrial plants.
