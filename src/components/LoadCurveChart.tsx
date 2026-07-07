@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartCard, { CHART, ChartTooltip, TICK_STYLE } from "@/components/ChartCard";
-import { fmtHour, fmtNumber } from "@/lib/format";
+import { useI18n } from "@/components/LanguageProvider";
 import type { LoadCurvePoint } from "@/types/plant";
 
 interface Props {
@@ -19,21 +19,24 @@ interface Props {
 }
 
 export default function LoadCurveChart({ data }: Props) {
+  const { t, fmt } = useI18n();
+  const c = t.charts.load;
+
   return (
     <ChartCard
-      title="Daily electricity load — before vs after TESSA"
-      subtitle="Peak shaved during the shift; overnight valley filled by off-peak charging (kW)"
+      title={c.title}
+      subtitle={c.subtitle}
       legend={[
-        { color: CHART.muted, label: "Before TESSA" },
-        { color: CHART.volt, label: "After TESSA" },
+        { color: CHART.muted, label: c.before },
+        { color: CHART.volt, label: c.after },
       ]}
       table={{
-        caption: "Hourly electrical load before and after TESSA",
-        headers: ["Hour", "Before (kW)", "After (kW)"],
+        caption: c.caption,
+        headers: [c.hour, c.beforeKw, c.afterKw],
         rows: data.map((d) => [
-          fmtHour(d.hour),
-          fmtNumber(d.before),
-          fmtNumber(d.after),
+          fmt.hour(d.hour),
+          fmt.number(d.before),
+          fmt.number(d.after),
         ]),
       }}
     >
@@ -43,14 +46,14 @@ export default function LoadCurveChart({ data }: Props) {
           <XAxis
             dataKey="hour"
             ticks={[0, 6, 12, 18, 23]}
-            tickFormatter={fmtHour}
+            tickFormatter={fmt.hour}
             tick={TICK_STYLE}
             axisLine={{ stroke: CHART.grid }}
             tickLine={false}
           />
           <YAxis
             tick={TICK_STYLE}
-            tickFormatter={(v: number) => fmtNumber(v)}
+            tickFormatter={(v: number) => fmt.number(v)}
             axisLine={false}
             tickLine={false}
             width={52}
@@ -62,13 +65,13 @@ export default function LoadCurveChart({ data }: Props) {
                 active={active}
                 payload={payload}
                 label={label}
-                labelFormatter={(l) => fmtHour(Number(l))}
-                valueFormatter={(v) => `${fmtNumber(v)} kW`}
+                labelFormatter={(l) => fmt.hour(Number(l))}
+                valueFormatter={(v) => `${fmt.number(v)} kW`}
               />
             )}
           />
           <Line
-            name="Before TESSA"
+            name={c.before}
             dataKey="before"
             type="monotone"
             stroke={CHART.muted}
@@ -78,7 +81,7 @@ export default function LoadCurveChart({ data }: Props) {
             isAnimationActive={false}
           />
           <Area
-            name="After TESSA"
+            name={c.after}
             dataKey="after"
             type="monotone"
             stroke={CHART.volt}

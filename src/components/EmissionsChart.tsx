@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartCard, { CHART, ChartTooltip, TICK_STYLE } from "@/components/ChartCard";
-import { fmtNumber } from "@/lib/format";
+import { useI18n } from "@/components/LanguageProvider";
 import type { SimulationResult } from "@/types/plant";
 
 interface Props {
@@ -20,14 +20,17 @@ interface Props {
 }
 
 export default function EmissionsChart({ result }: Props) {
+  const { t, fmt } = useI18n();
+  const c = t.charts.emissions;
+
   const data = [
     {
-      name: "Before TESSA",
+      name: c.before,
       value: Math.round(result.co2BeforeTonnes),
       color: CHART.muted,
     },
     {
-      name: "After TESSA",
+      name: c.after,
       value: Math.round(result.co2AfterTonnes),
       color: CHART.volt,
     },
@@ -39,12 +42,12 @@ export default function EmissionsChart({ result }: Props) {
 
   return (
     <ChartCard
-      title="Annual CO₂ emissions — before vs after"
-      subtitle={`${fmtNumber(result.co2ReductionTonnes)} tonnes avoided per year (−${cutPct}%)`}
+      title={c.title}
+      subtitle={c.subtitle(fmt.number(result.co2ReductionTonnes), cutPct)}
       table={{
-        caption: "Annual CO2 emissions before and after TESSA",
-        headers: ["Scenario", "CO₂ (tonnes / year)"],
-        rows: data.map((d) => [d.name, fmtNumber(d.value)]),
+        caption: c.caption,
+        headers: [c.scenario, c.co2],
+        rows: data.map((d) => [d.name, fmt.number(d.value)]),
       }}
     >
       <ResponsiveContainer width="100%" height={260}>
@@ -58,7 +61,7 @@ export default function EmissionsChart({ result }: Props) {
           />
           <YAxis
             tick={TICK_STYLE}
-            tickFormatter={(v: number) => fmtNumber(v)}
+            tickFormatter={(v: number) => fmt.number(v)}
             axisLine={false}
             tickLine={false}
             width={52}
@@ -70,12 +73,12 @@ export default function EmissionsChart({ result }: Props) {
                 active={active}
                 payload={payload}
                 label={label}
-                valueFormatter={(v) => `${fmtNumber(v)} t`}
+                valueFormatter={(v) => `${fmt.number(v)} t`}
               />
             )}
           />
           <Bar
-            name="CO₂ emissions"
+            name={c.series}
             dataKey="value"
             barSize={24}
             radius={[4, 4, 0, 0]}
@@ -87,7 +90,7 @@ export default function EmissionsChart({ result }: Props) {
             <LabelList
               dataKey="value"
               position="top"
-              formatter={(v) => fmtNumber(Number(v))}
+              formatter={(v) => fmt.number(Number(v))}
               style={{
                 fill: "#eef2f8",
                 fontSize: 12,

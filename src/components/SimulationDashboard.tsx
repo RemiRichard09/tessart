@@ -2,15 +2,12 @@
 
 import { useMemo } from "react";
 import EmissionsChart from "@/components/EmissionsChart";
+import { useI18n } from "@/components/LanguageProvider";
 import LoadCurveChart from "@/components/LoadCurveChart";
 import SavingsBreakdownChart from "@/components/SavingsBreakdownChart";
 import SocChart from "@/components/SocChart";
 import { buildLoadCurve, buildSocCurve } from "@/lib/calculations";
-import {
-  fmtCurrencyCompact,
-  fmtNumber,
-  fmtYears,
-} from "@/lib/format";
+import { ASSUMPTIONS } from "@/lib/defaults";
 import type { PlantInput, SimulationResult } from "@/types/plant";
 
 interface Props {
@@ -57,6 +54,8 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 export default function SimulationDashboard({ input, result }: Props) {
+  const { t, fmt } = useI18n();
+  const d = t.dashboard;
   const loadCurve = useMemo(
     () => buildLoadCurve(input, result),
     [input, result],
@@ -68,90 +67,90 @@ export default function SimulationDashboard({ input, result }: Props) {
       {/* Headline */}
       <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr_1fr]">
         <div className="rounded-2xl border border-edge bg-gradient-to-br from-card to-card-2 p-7">
-          <p className="text-[13px] font-medium text-txt-2">
-            Total annual savings
-          </p>
+          <p className="text-[13px] font-medium text-txt-2">{d.totalSavings}</p>
           <p className="mt-2 text-[52px] leading-none font-semibold tracking-tight">
-            {fmtCurrencyCompact(result.totalSavings)}
+            {fmt.currencyCompact(result.totalSavings)}
           </p>
           <p className="mt-3 text-sm text-txt-2">
-            {fmtCurrencyCompact(result.fuelSavings)} fuel ·{" "}
-            {fmtCurrencyCompact(result.demandSavings)} demand charges
+            {d.savingsSplit(
+              fmt.currencyCompact(result.fuelSavings),
+              fmt.currencyCompact(result.demandSavings),
+            )}
           </p>
         </div>
         <StatTile
-          label="Simple payback"
-          value={fmtYears(result.paybackYears)}
-          sub={`on ${fmtCurrencyCompact(result.netCapex)} net CAPEX`}
+          label={d.payback}
+          value={fmt.years(result.paybackYears)}
+          sub={d.paybackSub(fmt.currencyCompact(result.netCapex))}
           accent="red"
         />
         <StatTile
-          label="CO₂ reduction"
-          value={`${fmtNumber(result.co2ReductionTonnes)} t/yr`}
-          sub="versus current heat source"
+          label={d.co2}
+          value={d.co2Value(fmt.number(result.co2ReductionTonnes))}
+          sub={d.co2Sub}
         />
       </div>
 
       {/* Configuration */}
       <div>
-        <SectionHeading>Recommended TESSA configuration</SectionHeading>
+        <SectionHeading>{d.configSection}</SectionHeading>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatTile
-            label="Storage size"
-            value={`${fmtNumber(result.sizeMWh, 1)} MWh`}
-            sub={`½ of ${fmtNumber(result.dailyThermalMWh, 1)} MWh daily demand`}
+            label={d.storageSize}
+            value={`${fmt.number(result.sizeMWh, 1)} MWh`}
+            sub={d.storageSizeSub(fmt.number(result.dailyThermalMWh, 1))}
             accent="ember"
           />
           <StatTile
-            label="Charge power"
-            value={`${fmtNumber(result.chargePowerKW)} kW`}
-            sub="12 h off-peak window"
+            label={d.chargePower}
+            value={`${fmt.number(result.chargePowerKW)} kW`}
+            sub={d.chargePowerSub(ASSUMPTIONS.chargeDurationHours)}
             accent="volt"
           />
           <StatTile
-            label="Discharge power"
-            value={`${fmtNumber(result.dischargePowerKW)} kW`}
-            sub={`over ${fmtNumber(input.operatingHoursPerDay)} h shift`}
+            label={d.dischargePower}
+            value={`${fmt.number(result.dischargePowerKW)} kW`}
+            sub={d.dischargePowerSub(fmt.number(input.operatingHoursPerDay))}
             accent="ember"
           />
           <StatTile
-            label="Peak reduction"
-            value={`${fmtNumber(result.peakReductionKW)} kW`}
-            sub={`of ${fmtNumber(input.peakDemandKW)} kW peak`}
+            label={d.peakReduction}
+            value={`${fmt.number(result.peakReductionKW)} kW`}
+            sub={d.peakReductionSub(fmt.number(input.peakDemandKW))}
             accent="volt"
           />
           <StatTile
-            label="Energy shifted"
-            value={`${fmtNumber(result.energyShiftedMWh)} MWh/yr`}
-            sub="fuel displaced by off-peak power"
+            label={d.energyShifted}
+            value={d.energyShiftedValue(fmt.number(result.energyShiftedMWh))}
+            sub={d.energyShiftedSub}
           />
         </div>
       </div>
 
       {/* Investment */}
       <div>
-        <SectionHeading>Investment</SectionHeading>
+        <SectionHeading>{d.investSection}</SectionHeading>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile
-            label="Estimated CAPEX"
-            value={fmtCurrencyCompact(result.capex)}
-            sub="at $150K per MWh installed"
+            label={d.capex}
+            value={fmt.currencyCompact(result.capex)}
+            sub={d.capexSub}
           />
           <StatTile
-            label="Subsidy estimate"
-            value={`−${fmtCurrencyCompact(result.subsidy)}`}
-            sub="Hydro-Québec incentive, capped at 75%"
+            label={d.subsidy}
+            value={`−${fmt.currencyCompact(result.subsidy)}`}
+            sub={d.subsidySub}
             accent="volt"
           />
           <StatTile
-            label="Net CAPEX"
-            value={fmtCurrencyCompact(result.netCapex)}
-            sub="after incentives"
+            label={d.netCapex}
+            value={fmt.currencyCompact(result.netCapex)}
+            sub={d.netCapexSub}
           />
           <StatTile
-            label="Annual fuel savings"
-            value={fmtCurrencyCompact(result.fuelSavings)}
-            sub="net of off-peak charging cost"
+            label={d.fuelSavings}
+            value={fmt.currencyCompact(result.fuelSavings)}
+            sub={d.fuelSavingsSub}
             accent="ember"
           />
         </div>
@@ -159,7 +158,7 @@ export default function SimulationDashboard({ input, result }: Props) {
 
       {/* Charts */}
       <div>
-        <SectionHeading>Simulation charts</SectionHeading>
+        <SectionHeading>{d.chartsSection}</SectionHeading>
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="lg:col-span-2">
             <LoadCurveChart data={loadCurve} />

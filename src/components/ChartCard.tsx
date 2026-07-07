@@ -1,6 +1,7 @@
 "use client";
 
 import type { TooltipContentProps } from "recharts";
+import { useI18n } from "@/components/LanguageProvider";
 
 /** Chart palette — validated against the card surface (#101d33), dark mode. */
 export const CHART = {
@@ -46,6 +47,7 @@ export default function ChartCard({
   table,
   children,
 }: Props) {
+  const { t } = useI18n();
   return (
     <section className="flex flex-col rounded-2xl border border-edge bg-card p-5">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5">
@@ -75,7 +77,7 @@ export default function ChartCard({
       <div className="min-h-0 flex-1">{children}</div>
       <details className="mt-3 border-t border-edge pt-2.5">
         <summary className="cursor-pointer text-xs text-txt-3 select-none hover:text-txt-2">
-          View data table
+          {t.common.viewData}
         </summary>
         <div className="mt-2 max-h-56 overflow-auto">
           <table className="w-full text-left text-xs [font-variant-numeric:tabular-nums]">

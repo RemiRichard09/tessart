@@ -4,8 +4,7 @@ import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { labelFor, PROCESS_OPTIONS } from "@/lib/defaults";
-import { fmtNumber } from "@/lib/format";
+import { useI18n } from "@/components/LanguageProvider";
 import type { PlantInput, SimulationResult } from "@/types/plant";
 
 const COLOR = {
@@ -17,24 +16,36 @@ const COLOR = {
   ground: "#0c1830",
 };
 
-function Label({
-  position,
-  title,
-  detail,
-}: {
-  position: [number, number, number];
+interface LabelText {
   title: string;
   detail?: string;
+}
+
+/** All human-readable strings, resolved outside the Canvas (React context
+ *  does not cross the react-three-fiber renderer boundary). */
+interface SceneStrings {
+  grid: LabelText;
+  tessa: LabelText;
+  process: LabelText;
+  waste: LabelText;
+}
+
+function Label({
+  position,
+  text,
+}: {
+  position: [number, number, number];
+  text: LabelText;
 }) {
   return (
     <Html position={position} center distanceFactor={9} occlude={false}>
       <div className="pointer-events-none w-max rounded-lg border border-[#2a3b5c] bg-[#0d1830]/90 px-3 py-1.5 text-center shadow-lg backdrop-blur-sm">
         <p className="text-[11px] font-semibold whitespace-nowrap text-[#eef2f8]">
-          {title}
+          {text.title}
         </p>
-        {detail ? (
+        {text.detail ? (
           <p className="text-[10px] whitespace-nowrap text-[#93a0b5]">
-            {detail}
+            {text.detail}
           </p>
         ) : null}
       </div>
@@ -140,7 +151,7 @@ function GridConnection() {
   );
 }
 
-function TessaBattery({ sizeMWh }: { sizeMWh: number }) {
+function TessaBattery({ label }: { label: LabelText }) {
   const core = useRef<THREE.MeshStandardMaterial>(null);
   useFrame(({ clock }) => {
     if (core.current) {
@@ -191,16 +202,12 @@ function TessaBattery({ sizeMWh }: { sizeMWh: number }) {
         intensity={3}
         distance={5}
       />
-      <Label
-        position={[0, 2.55, 0]}
-        title="TESSA thermal battery"
-        detail={`${fmtNumber(sizeMWh, 1)} MWh · 100–500 °C`}
-      />
+      <Label position={[0, 2.55, 0]} text={label} />
     </group>
   );
 }
 
-function ProcessUnit({ label, tempC }: { label: string; tempC: number }) {
+function ProcessUnit({ label }: { label: LabelText }) {
   return (
     <group position={[4.8, 0, -1.6]}>
       {/* Main hall */}
@@ -228,16 +235,12 @@ function ProcessUnit({ label, tempC }: { label: string; tempC: number }) {
           toneMapped={false}
         />
       </mesh>
-      <Label
-        position={[0, 2.35, 0.9]}
-        title={label}
-        detail={`Process heat user · ${fmtNumber(tempC)} °C`}
-      />
+      <Label position={[0, 2.35, 0.9]} text={label} />
     </group>
   );
 }
 
-function WasteHeatSource() {
+function WasteHeatSource({ label }: { label: LabelText }) {
   const fan = useRef<THREE.Mesh>(null);
   useFrame((_, delta) => {
     if (fan.current) fan.current.rotation.y += delta * 2.2;
@@ -262,11 +265,7 @@ function WasteHeatSource() {
           emissiveIntensity={0.7}
         />
       </mesh>
-      <Label
-        position={[0.4, 1.75, 0.4]}
-        title="Waste heat source"
-        detail="Exhaust recovery"
-      />
+      <Label position={[0.4, 1.75, 0.4]} text={label} />
     </group>
   );
 }
@@ -286,9 +285,7 @@ function Ground() {
   );
 }
 
-function Scene({ input, result }: Props) {
-  const processLabel = labelFor(PROCESS_OPTIONS, input.process);
-
+function Scene({ strings }: { strings: SceneStrings }) {
   return (
     <>
       <ambientLight intensity={0.55} />
@@ -300,14 +297,10 @@ function Scene({ input, result }: Props) {
       />
       <Ground />
       <GridConnection />
-      <Label
-        position={[-5.2, 3.15, 1.5]}
-        title="Grid connection"
-        detail={`${fmtNumber(input.availableCapacityKW)} kW available`}
-      />
-      <TessaBattery sizeMWh={result.sizeMWh} />
-      <ProcessUnit label={processLabel} tempC={input.processTempC} />
-      <WasteHeatSource />
+      <Label position={[-5.2, 3.15, 1.5]} text={strings.grid} />
+      <TessaBattery label={strings.tessa} />
+      <ProcessUnit label={strings.process} />
+      <WasteHeatSource label={strings.waste} />
 
       {/* Electricity: grid → TESSA (charging) */}
       <Flow
@@ -359,13 +352,31 @@ interface Props {
   result: SimulationResult;
 }
 
-const LEGEND = [
-  { color: COLOR.electricity, label: "Electricity — off-peak charging" },
-  { color: COLOR.heat, label: "Heat — TESSA to process" },
-  { color: COLOR.wasteHeat, label: "Waste heat — recovered into TESSA" },
-];
-
 export default function PlantTwin3D({ input, result }: Props) {
+  const { t, fmt } = useI18n();
+
+  const strings: SceneStrings = {
+    grid: {
+      title: t.twin.grid,
+      detail: t.twin.gridDetail(fmt.number(input.availableCapacityKW)),
+    },
+    tessa: {
+      title: t.twin.tessa,
+      detail: t.twin.tessaDetail(fmt.number(result.sizeMWh, 1)),
+    },
+    process: {
+      title: t.options.process[input.process],
+      detail: t.twin.processDetail(fmt.number(input.processTempC)),
+    },
+    waste: { title: t.twin.waste, detail: t.twin.wasteDetail },
+  };
+
+  const legend = [
+    { color: COLOR.electricity, label: t.twin.legendElec },
+    { color: COLOR.heat, label: t.twin.legendHeat },
+    { color: COLOR.wasteHeat, label: t.twin.legendWaste },
+  ];
+
   return (
     <div className="overflow-hidden rounded-2xl border border-edge bg-card">
       <div className="h-[440px] sm:h-[520px]">
@@ -376,11 +387,11 @@ export default function PlantTwin3D({ input, result }: Props) {
         >
           <color attach="background" args={["#0a1424"]} />
           <fog attach="fog" args={["#0a1424", 24, 44]} />
-          <Scene input={input} result={result} />
+          <Scene strings={strings} />
         </Canvas>
       </div>
       <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-t border-edge px-5 py-3.5">
-        {LEGEND.map((l) => (
+        {legend.map((l) => (
           <span
             key={l.label}
             className="flex items-center gap-2 text-xs text-txt-2"
@@ -393,7 +404,7 @@ export default function PlantTwin3D({ input, result }: Props) {
           </span>
         ))}
         <span className="ml-auto hidden text-xs text-txt-3 sm:block">
-          Drag to orbit · scroll to zoom
+          {t.twin.hint}
         </span>
       </div>
     </div>

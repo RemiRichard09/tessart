@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useI18n } from "@/components/LanguageProvider";
 import {
   HEAT_SOURCE_OPTIONS,
   INDUSTRY_OPTIONS,
@@ -58,6 +59,8 @@ function Section({
 
 export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
   const formId = useId();
+  const { t } = useI18n();
+  const f = t.form;
 
   const set = <K extends keyof PlantInput>(key: K, v: PlantInput[K]) =>
     onChange({ ...value, [key]: v });
@@ -75,59 +78,59 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
         onSubmit();
       }}
     >
-      <Section title="Plant identity">
-        <Field label="Plant name">
+      <Section title={f.sections.identity}>
+        <Field label={f.name}>
           <input
             className={inputClass}
             value={value.name}
             required
             onChange={(e) => set("name", e.target.value)}
-            placeholder="e.g. Boreal Asphalt — Plant 07"
+            placeholder={f.namePlaceholder}
           />
         </Field>
-        <Field label="Industry type">
+        <Field label={f.industry}>
           <select
             className={inputClass}
             value={value.industry}
             onChange={(e) => set("industry", e.target.value as never)}
           >
-            {INDUSTRY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
+            {INDUSTRY_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {t.options.industry[v]}
               </option>
             ))}
           </select>
         </Field>
       </Section>
 
-      <Section title="Thermal process">
-        <Field label="Current heat source">
+      <Section title={f.sections.process}>
+        <Field label={f.heatSource}>
           <select
             className={inputClass}
             value={value.heatSource}
             onChange={(e) => set("heatSource", e.target.value as never)}
           >
-            {HEAT_SOURCE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
+            {HEAT_SOURCE_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {t.options.heatSource[v]}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Main thermal process">
+        <Field label={f.processField}>
           <select
             className={inputClass}
             value={value.process}
             onChange={(e) => set("process", e.target.value as never)}
           >
-            {PROCESS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
+            {PROCESS_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {t.options.process[v]}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Process temperature" unit="°C">
+        <Field label={f.processTemp} unit={f.units.celsius}>
           <input
             type="number"
             className={inputClass}
@@ -139,8 +142,8 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
         </Field>
       </Section>
 
-      <Section title="Energy & operations">
-        <Field label="Annual energy consumption" unit="MWh / year">
+      <Section title={f.sections.energy}>
+        <Field label={f.annualEnergy} unit={f.units.mwhYear}>
           <input
             type="number"
             className={inputClass}
@@ -150,7 +153,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("annualEnergyMWh")}
           />
         </Field>
-        <Field label="Peak electrical demand" unit="kW">
+        <Field label={f.peakDemand} unit={f.units.kw}>
           <input
             type="number"
             className={inputClass}
@@ -160,7 +163,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("peakDemandKW")}
           />
         </Field>
-        <Field label="Available electrical capacity" unit="kW">
+        <Field label={f.availableCapacity} unit={f.units.kw}>
           <input
             type="number"
             className={inputClass}
@@ -170,7 +173,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("availableCapacityKW")}
           />
         </Field>
-        <Field label="Operating hours per day" unit="h / day">
+        <Field label={f.hoursPerDay} unit={f.units.hDay}>
           <input
             type="number"
             className={inputClass}
@@ -181,7 +184,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("operatingHoursPerDay")}
           />
         </Field>
-        <Field label="Operating days per year" unit="days / year">
+        <Field label={f.daysPerYear} unit={f.units.dYear}>
           <input
             type="number"
             className={inputClass}
@@ -194,8 +197,8 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
         </Field>
       </Section>
 
-      <Section title="Tariffs & emissions">
-        <Field label="Electricity rate" unit="$ / MWh">
+      <Section title={f.sections.tariffs}>
+        <Field label={f.elecRate} unit={f.units.perMwh}>
           <input
             type="number"
             className={inputClass}
@@ -206,7 +209,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("electricityRatePerMWh")}
           />
         </Field>
-        <Field label="Peak demand charge" unit="$ / kW / month">
+        <Field label={f.demandCharge} unit={f.units.perKwMonth}>
           <input
             type="number"
             className={inputClass}
@@ -217,7 +220,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("demandChargePerKWMonth")}
           />
         </Field>
-        <Field label="Fuel cost" unit="$ / MWh">
+        <Field label={f.fuelCost} unit={f.units.perMwh}>
           <input
             type="number"
             className={inputClass}
@@ -228,7 +231,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
             onChange={setNum("fuelCostPerMWh")}
           />
         </Field>
-        <Field label="CO₂ factor" unit="kg / MWh">
+        <Field label={f.co2Factor} unit={f.units.kgMwh}>
           <input
             type="number"
             className={inputClass}
@@ -246,7 +249,7 @@ export default function PlantIntakeForm({ value, onChange, onSubmit }: Props) {
           type="submit"
           className="rounded-xl bg-accent px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-colors hover:bg-accent-bright"
         >
-          Generate digital twin →
+          {t.studio.generateTwin}
         </button>
       </div>
     </form>

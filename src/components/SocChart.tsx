@@ -10,7 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartCard, { CHART, ChartTooltip, TICK_STYLE } from "@/components/ChartCard";
-import { fmtHour, fmtNumber } from "@/lib/format";
+import { useI18n } from "@/components/LanguageProvider";
 import type { SocPoint } from "@/types/plant";
 
 interface Props {
@@ -19,17 +19,20 @@ interface Props {
 }
 
 export default function SocChart({ data, sizeMWh }: Props) {
+  const { t, fmt } = useI18n();
+  const c = t.charts.soc;
+
   return (
     <ChartCard
-      title="TESSA state of charge — 24 hours"
-      subtitle={`Charges overnight, discharges across the shift · capacity ${fmtNumber(sizeMWh, 1)} MWh`}
+      title={c.title}
+      subtitle={c.subtitle(fmt.number(sizeMWh, 1))}
       table={{
-        caption: "TESSA state of charge by hour",
-        headers: ["Hour", "State of charge (%)", "Stored (MWh)"],
+        caption: c.caption,
+        headers: [c.hour, c.socPct, c.stored],
         rows: data.map((d) => [
-          fmtHour(d.hour),
+          fmt.hour(d.hour),
           d.socPct,
-          fmtNumber(d.socMWh, 1),
+          fmt.number(d.socMWh, 1),
         ]),
       }}
     >
@@ -39,7 +42,7 @@ export default function SocChart({ data, sizeMWh }: Props) {
           <XAxis
             dataKey="hour"
             ticks={[0, 6, 12, 18, 23]}
-            tickFormatter={fmtHour}
+            tickFormatter={fmt.hour}
             tick={TICK_STYLE}
             axisLine={{ stroke: CHART.grid }}
             tickLine={false}
@@ -60,13 +63,13 @@ export default function SocChart({ data, sizeMWh }: Props) {
                 active={active}
                 payload={payload}
                 label={label}
-                labelFormatter={(l) => fmtHour(Number(l))}
-                valueFormatter={(v) => `${fmtNumber(v)} %`}
+                labelFormatter={(l) => fmt.hour(Number(l))}
+                valueFormatter={(v) => `${fmt.number(v)} %`}
               />
             )}
           />
           <Area
-            name="State of charge"
+            name={c.series}
             dataKey="socPct"
             type="monotone"
             stroke={CHART.ember}

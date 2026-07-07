@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import ChartCard, { CHART, ChartTooltip, TICK_STYLE } from "@/components/ChartCard";
-import { fmtCurrency, fmtCurrencyCompact } from "@/lib/format";
+import { useI18n } from "@/components/LanguageProvider";
 import type { SimulationResult } from "@/types/plant";
 
 interface Props {
@@ -20,14 +20,17 @@ interface Props {
 }
 
 export default function SavingsBreakdownChart({ result }: Props) {
+  const { t, fmt } = useI18n();
+  const c = t.charts.savings;
+
   const data = [
     {
-      name: "Fuel savings",
+      name: c.catFuel,
       value: Math.round(result.fuelSavings),
       color: CHART.ember,
     },
     {
-      name: "Demand savings",
+      name: c.catDemand,
       value: Math.round(result.demandSavings),
       color: CHART.volt,
     },
@@ -35,16 +38,16 @@ export default function SavingsBreakdownChart({ result }: Props) {
 
   return (
     <ChartCard
-      title="Annual savings breakdown"
-      subtitle={`Total ${fmtCurrencyCompact(result.totalSavings)} per year (CAD)`}
+      title={c.title}
+      subtitle={c.subtitle(fmt.currencyCompact(result.totalSavings))}
       legend={[
-        { color: CHART.ember, label: "Displaced fuel (net of charging)" },
-        { color: CHART.volt, label: "Peak demand charges" },
+        { color: CHART.ember, label: c.legendFuel },
+        { color: CHART.volt, label: c.legendDemand },
       ]}
       table={{
-        caption: "Annual savings by category",
-        headers: ["Category", "Annual savings (CAD)"],
-        rows: data.map((d) => [d.name, fmtCurrency(d.value)]),
+        caption: c.caption,
+        headers: [c.category, c.annual],
+        rows: data.map((d) => [d.name, fmt.currency(d.value)]),
       }}
     >
       <ResponsiveContainer width="100%" height={260}>
@@ -57,7 +60,7 @@ export default function SavingsBreakdownChart({ result }: Props) {
           <XAxis
             type="number"
             tick={TICK_STYLE}
-            tickFormatter={(v: number) => fmtCurrencyCompact(v)}
+            tickFormatter={(v: number) => fmt.currencyCompact(v)}
             axisLine={false}
             tickLine={false}
           />
@@ -76,12 +79,12 @@ export default function SavingsBreakdownChart({ result }: Props) {
                 active={active}
                 payload={payload}
                 label={label}
-                valueFormatter={(v) => fmtCurrency(v)}
+                valueFormatter={(v) => fmt.currency(v)}
               />
             )}
           />
           <Bar
-            name="Annual savings"
+            name={c.series}
             dataKey="value"
             barSize={24}
             radius={[0, 4, 4, 0]}
@@ -93,7 +96,7 @@ export default function SavingsBreakdownChart({ result }: Props) {
             <LabelList
               dataKey="value"
               position="right"
-              formatter={(v) => fmtCurrencyCompact(Number(v))}
+              formatter={(v) => fmt.currencyCompact(Number(v))}
               style={{
                 fill: "#eef2f8",
                 fontSize: 12,

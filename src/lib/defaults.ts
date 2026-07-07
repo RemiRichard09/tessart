@@ -28,35 +28,36 @@ export const ASSUMPTIONS = {
   gridCo2KgPerMWh: 1.7,
 } as const;
 
-export const INDUSTRY_OPTIONS: { value: IndustryType; label: string }[] = [
-  { value: "asphalt", label: "Asphalt" },
-  { value: "food-processing", label: "Food processing" },
-  { value: "sawmill", label: "Sawmill" },
-  { value: "mining", label: "Mining" },
-  { value: "aluminum", label: "Aluminum" },
-  { value: "pulp-and-paper", label: "Pulp and paper" },
-  { value: "greenhouse", label: "Greenhouse" },
-  { value: "other", label: "Other" },
+// Display labels live in lib/dictionaries.ts (t.options.*).
+export const INDUSTRY_OPTIONS: IndustryType[] = [
+  "asphalt",
+  "food-processing",
+  "sawmill",
+  "mining",
+  "aluminum",
+  "pulp-and-paper",
+  "greenhouse",
+  "other",
 ];
 
-export const HEAT_SOURCE_OPTIONS: { value: HeatSource; label: string }[] = [
-  { value: "natural-gas", label: "Natural gas" },
-  { value: "propane", label: "Propane" },
-  { value: "electricity", label: "Electricity" },
-  { value: "biomass", label: "Biomass" },
-  { value: "waste-heat", label: "Waste heat" },
-  { value: "mixed", label: "Mixed" },
+export const HEAT_SOURCE_OPTIONS: HeatSource[] = [
+  "natural-gas",
+  "propane",
+  "electricity",
+  "biomass",
+  "waste-heat",
+  "mixed",
 ];
 
-export const PROCESS_OPTIONS: { value: ThermalProcess; label: string }[] = [
-  { value: "dryer", label: "Dryer" },
-  { value: "oven", label: "Oven" },
-  { value: "boiler", label: "Boiler" },
-  { value: "air-make-up", label: "Air make-up" },
-  { value: "thermal-oil-loop", label: "Thermal oil loop" },
-  { value: "steam", label: "Steam" },
-  { value: "furnace", label: "Furnace" },
-  { value: "other", label: "Other" },
+export const PROCESS_OPTIONS: ThermalProcess[] = [
+  "dryer",
+  "oven",
+  "boiler",
+  "air-make-up",
+  "thermal-oil-loop",
+  "steam",
+  "furnace",
+  "other",
 ];
 
 /** Pre-filled demo plant so the flow can be walked end-to-end immediately. */
@@ -77,9 +78,3 @@ export const DEFAULT_PLANT_INPUT: PlantInput = {
   co2FactorKgPerMWh: 215,
 };
 
-export function labelFor<T extends string>(
-  options: { value: T; label: string }[],
-  value: T,
-): string {
-  return options.find((o) => o.value === value)?.label ?? value;
-}
