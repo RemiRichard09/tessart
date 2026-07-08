@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #070e1d;
+  --foreground: #eef2f8;
+  /* Legacy palette kept for the /economie tool */
   --primary: #0e4a2f;
   --primary-light: #16a34a;
-  --accent: #f97316;
+  --accent: #e0504f;
 }
 
 @theme inline {
@@ -13,8 +14,23 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
-  --color-accent: var(--accent);
-  --font-sans: system-ui, -apple-system, sans-serif;
+
+  /* TESSA Plant Studio palette */
+  --color-navy-950: #070e1d;
+  --color-navy-900: #0a1424;
+  --color-card: #101d33;
+  --color-card-2: #16233c;
+  --color-edge: #1e2c47;
+  --color-accent: #e0504f;
+  --color-accent-bright: #ff5f57;
+  --color-volt: #4c8dff;
+  --color-ember: #e2661a;
+  --color-ember-bright: #f97316;
+  --color-txt: #eef2f8;
+  --color-txt-2: #93a0b5;
+  --color-txt-3: #5b6b85;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, monospace;
 }
 
@@ -22,4 +38,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Recessive scrollbars for the dark shell */
+::selection {
+  background: rgba(76, 141, 255, 0.35);
 }
